@@ -1,13 +1,12 @@
 from flask import render_template
 from flask import request
 
-from app_folder import app
-import time
+from __init__ import app
 import ast
 pagenum = 1
 dataset = []
 b = 0
-productinfo = open("ProductInfo.txt")
+productinfo = open("/home/TilTin/LCBOw/Backup-LCBO/app_folder/ProductInfo.txt")
 for line in productinfo:
     dataset.append(line)
 datasetfresh = []
@@ -81,36 +80,11 @@ def searchfor():
     if request.method == 'POST':
         if request.form.get('sort-by-cheapest'):
             return render_template("products.html")
-    for l in datasetfresh:
-        l = ast.literal_eval(l)
-        for i in l["result"]:
-            if i["secondary_category"] == secondarycat or i["primary_category"] == secondarycat:
-                dict_cont[i["id"]] = [i["alcohol_content"], i["price_in_cents"], i["package_unit_volume_in_milliliters"]]
+    secondaryitems = open("/home/TilTin/LCBOw/Backup-LCBO/app_folder/Preloaded/{}.txt".format(secondarycat))
+    lst = secondaryitems.readlines()
 
-    for i in range(len(dict_cont)):
-        if dict_cont[list(dict_cont.keys())[i]][0] != 0 and dict_cont[list(dict_cont.keys())[i]][2] != 0:
-            dict_abv_dollar[list(dict_cont.keys())[i]] = (float(dict_cont[list(dict_cont.keys())[i]][1]) / 100) / ((float(dict_cont[list(dict_cont.keys())[i]][0]) / 10000) * float(dict_cont[list(dict_cont.keys())[i]][2]))
-    #print(dict_abv_dollar)
-
-    sorted_abv_dollar = sorted(list(dict_abv_dollar.values()))
-    #print(sorted_abv_dollar)
-    sorted_abv_dollar = sorted_abv_dollar[:50]
-    for v in sorted_abv_dollar:
-        if v != prev:
-            for productid in searchabv(v,dict_abv_dollar):
-                ids.append(productid)
-        prev = v
-
-    current_database = database()
-    for productid in ids:
-        items.append(current_database[productid])
-    #for i in items:
-
-
-
-        #sort by price, get fucked ratio, binary search
-
-
+    for line in lst:
+        items.append(ast.literal_eval(line))
 
     return render_template("search.html",
                            title='Home',
@@ -145,34 +119,16 @@ def searchforPOST():
     if request.method == 'POST':
         if request.form.get('sort-by-cheapest'):
             return render_template("products.html")
-    for l in datasetfresh:
-        l = ast.literal_eval(l)
-        for i in l["result"]:
-            if i["secondary_category"] == secondarycat or i["primary_category"] == secondarycat:
-                dict_cont[i["id"]] = [i["alcohol_content"], i["price_in_cents"], i["package_unit_volume_in_milliliters"]]
-
-    for i in range(len(dict_cont)):
-        if dict_cont[list(dict_cont.keys())[i]][0] != 0 and dict_cont[list(dict_cont.keys())[i]][2] != 0:
-            dict_abv_dollar[list(dict_cont.keys())[i]] = (float(dict_cont[list(dict_cont.keys())[i]][1]) / 100) / ((float(dict_cont[list(dict_cont.keys())[i]][0]) / 10000) * float(dict_cont[list(dict_cont.keys())[i]][2]))
-    #print(dict_abv_dollar)
-
-    sorted_abv_dollar = sorted(list(dict_abv_dollar.values()))
-    #print(sorted_abv_dollar)
-    sorted_abv_dollar = sorted_abv_dollar[:50]
-    for v in sorted_abv_dollar:
-        if v != prev:
-            for productid in searchabv(v,dict_abv_dollar):
-                ids.append(productid)
-        prev = v
-
-    current_database = database()
-    for productid in ids:
-        items.append(current_database[productid])
-    #for i in items:
-
-
-
-        #sort by price, get fucked ratio, binary search
+    secondaryitems = open("/home/TilTin/LCBOw/Backup-LCBO/app_folder/Preloaded/{}.txt".format(secondarycat))
+    if type(secondaryitems[0]) != "2":
+        return render_template("search.html",
+                           title='Home',
+                           user=user,
+                           items=items,
+                           test=test,
+                        desiredamount = desiredamount)
+    for line in secondaryitems:
+        items.append(ast.literal_eval(line))
 
 
 
